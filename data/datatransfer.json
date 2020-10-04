@@ -1,0 +1,1 @@
+[{"backPort":3306,"deptName":"天门市工商局","backUserName":"root","mainPassword":"123456","backIpAddress":"192.168.1.5","mainPort":3306,"mainIpAddress":"192.168.1.7","mainUserName":"root","id":1,"backDatabaseName":"mall","backPassword":"123456","mainDatabaseName":"mall"}]
