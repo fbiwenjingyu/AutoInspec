@@ -134,7 +134,7 @@ public class DataTransferDao {
 			data[i][1] = dataTransferVO.getDeptName();
 			data[i][2] = dataTransferVO.getMainDatabaseName();
 			data[i][3] = dataTransferVO.getBackDatabaseName();
-			data[i][4] = "一键传输";
+			data[i][4] = "数据传输";
 		}
 		return data;
 	} 
@@ -148,7 +148,7 @@ public class DataTransferDao {
 			data[i][1] = dataTransferVO.getDeptName();
 			data[i][2] = dataTransferVO.getMainDatabaseName();
 			data[i][3] = dataTransferVO.getBackDatabaseName();
-			data[i][4] = "一键传输";
+			data[i][4] = "数据传输";
 		}
 		return data;
 	} 
