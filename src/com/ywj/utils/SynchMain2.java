@@ -30,7 +30,7 @@ public class SynchMain2 {
 
 		String tableName = synchtablename;
 		// 获取同步字段名
-		List<TableFieldVO> list = MyDataBaseUtil.getFieldsForTable(tableName, maindb);
+		List<TableFieldVO> list = MyDataBaseUtil.getFieldsForTable("`" + tableName + "`", maindb);
 		if(list.isEmpty()) return;
 		
 		String fields = "" + list.get(0).getColumnName() + "";
@@ -165,8 +165,8 @@ public class SynchMain2 {
 			try {
 				String orderby = "".equals(idfield) ? "" : " order by " + idfield + " ";
 				String limit = orderby + " limit " + (curpage - 1) * pageSize + "," + pageSize;
-				String mainQuerySQL = "select * from " + tableName + limit;
-				String bakInsertSQL = "insert into " + tableName + " (" + fields + ") values (" + values + ")";
+				String mainQuerySQL = "select * from " + "`" + tableName + "`" + limit;
+				String bakInsertSQL = "insert into " + "`" + tableName + "`" + " (" + fields + ") values (" + values + ")";
 				System.out.println("bakInsertSQL=" + bakInsertSQL);
 				// 主库
 				mainconn = MyDataBaseUtil.getMySQLConnect(maindb);
@@ -244,7 +244,7 @@ public class SynchMain2 {
 	private long getTotalCount(Connection mainconn, String tableName) throws Exception{
 		Statement stmt = mainconn.createStatement();  
         // 为每个线程分配结果集
-        ResultSet rs = stmt.executeQuery("SELECT count(*) FROM " + tableName);  
+        ResultSet rs = stmt.executeQuery("SELECT count(*) FROM " + "`" + tableName + "`");  
         rs.next();  
         // 总共处理的数量
         long totalCount = rs.getLong(1);  
@@ -252,8 +252,8 @@ public class SynchMain2 {
         return totalCount;
 	}
 
-	private void truncateBackTable(Connection bakconn, String synchtablename) throws SQLException {
-		String sql = "truncate table " + synchtablename;
+	private void truncateBackTable(Connection bakconn, String tableName) throws SQLException {
+		String sql = "truncate table " + "`" + tableName + "`";
 		PreparedStatement statement = bakconn.prepareStatement(sql);
 		statement.executeUpdate();
 		bakconn.close();
