@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -103,6 +104,12 @@ public class DataTransferDialog extends JDialog {
 				
 				ExecutorService exector = Executors.newFixedThreadPool(tableNames.size());
 				long startTime = System.currentTimeMillis();
+//				try {
+//					mainAndBackDataSourceConnectDBVO.cancelForeinKey();
+//				} catch (SQLException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 				for(String tableName : tableNames) {
 					SynchTask synchTask = new SynchTask(mainAndBackDataSourceConnectDBVO,tableName);
 					exector.submit(synchTask);
@@ -116,6 +123,12 @@ public class DataTransferDialog extends JDialog {
 				System.out.println("总共 耗时："
 						+ (System.currentTimeMillis() - startTime) + "毫秒");
 				
+//				try {
+//					mainAndBackDataSourceConnectDBVO.setForeinKey();
+//				} catch (SQLException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 				JOptionPane.showMessageDialog(DataTransferDialog.this, "数据传输完成，总共耗时 " + (System.currentTimeMillis() - startTime)/1000 + "秒","提示",JOptionPane.INFORMATION_MESSAGE);
 			}
 		});

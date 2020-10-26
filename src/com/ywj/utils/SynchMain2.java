@@ -19,6 +19,7 @@ public class SynchMain2 {
 
 	public void synch(MainAndBackDataSourceConnectDBVO mainAndBackDataSourceVO, String synchtablename)
 			throws Exception {
+		//mainAndBackDataSourceVO.cancelForeinKey();
 		DataSourceConnectDBVO maindb = mainAndBackDataSourceVO.getMaindb();
 		DataSourceConnectDBVO bakdb = mainAndBackDataSourceVO.getBakdb();
 
@@ -29,6 +30,7 @@ public class SynchMain2 {
 		}
 
 		String tableName = synchtablename;
+		
 		// 获取同步字段名
 		List<TableFieldVO> list = MyDataBaseUtil.getFieldsForTable("`" + tableName + "`", maindb);
 		if(list.isEmpty()) return;
@@ -53,7 +55,12 @@ public class SynchMain2 {
 		Connection bakconn = null;
 		bakconn = MyDataBaseUtil.getMySQLConnect(bakdb);
 		mainconn = MyDataBaseUtil.getMySQLConnect(maindb);
-		truncateBackTable(bakconn,tableName);
+		try {
+			truncateBackTable(bakconn,tableName);
+		}catch(Exception e) {
+			deleteBackTable(bakconn,tableName);
+		}
+		
 		
 		long startTime = System.currentTimeMillis();
 		long totalCount = getTotalCount(mainconn,tableName); 
@@ -73,6 +80,14 @@ public class SynchMain2 {
 				+ (System.currentTimeMillis() - startTime) + "毫秒");
 	}
 	
+	private void deleteBackTable(Connection bakconn, String tableName) throws Exception{
+		String sql = "delete from " + "`" + tableName + "`";
+		PreparedStatement statement = bakconn.prepareStatement(sql);
+		statement.executeUpdate();
+		bakconn.close();
+		
+	}
+
 	public static final class WorkThread extends Thread{
 		private String tableName;
 		private int curpage;
