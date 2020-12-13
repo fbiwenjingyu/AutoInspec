@@ -6,7 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JdbcUtils {
+	private static final Logger logger = LoggerFactory.getLogger(JdbcUtils.class); 
 		// 连接驱动
 		//private static final String DRIVER = "com.mysql.jdbc.Driver"; 
 		// 连接驱动
@@ -26,13 +30,16 @@ public class JdbcUtils {
 		 * 获取数据库连接
 		 */
 		public  static Connection getConn(String url,String username,String password) {
+			logger.debug("JdbcUtils类，方法 ：getConn 获取数据库连接开始");
 			Connection conn = null;
 			try {
 				conn = DriverManager.getConnection(url, username, password);
 				//System.out.println("数据库连接成功!");
 			} catch (SQLException e) {
 				e.printStackTrace();
+				logger.error("JdbcUtils类，方法 ：getConn 获取数据库连接出错，错误信息为：" + e.toString());
 			}
+			logger.debug("JdbcUtils类，方法 ：getConn 获取数据库连接结束");
 			return conn;
 		}
 		

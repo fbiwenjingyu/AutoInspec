@@ -7,10 +7,15 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ywj.model.DataSourceConnectDBVO;
 import com.ywj.model.TableFieldVO;
 
+
 public class MyDataBaseUtil {
+	private static final Logger logger = LoggerFactory.getLogger(MyDataBaseUtil.class); 
 	public static List<TableFieldVO> getFieldsForTable(String tableName,DataSourceConnectDBVO maindb) throws Exception{
 		List<TableFieldVO> list = new ArrayList<TableFieldVO>();
 		Connection connection = getMySQLConnect(maindb);
@@ -42,7 +47,9 @@ public class MyDataBaseUtil {
 		DatabaseMetaData metaData = con.getMetaData();
 		ResultSet rs = metaData.getTables(db.getDatabaseName(), "", null, null);
 		while(rs.next()) {
-			names.add(rs.getString(3));  
+			if (rs.getString(4).equalsIgnoreCase("TABLE")) {
+				names.add(rs.getString(3)); 
+			}
 		}
 		con.close();
 		return names;
