@@ -31,6 +31,7 @@ public class MainFrame extends JFrame
 		contentTabPanel.addTab("控制台管理",new ConsolePanel());
 		contentTabPanel.addTab("数据统计",new DataBasePanel());
 		contentTabPanel.addTab("数据传输",new DataTransferPanel());
+		contentTabPanel.addTab("更新时间统计",new UpdateTimePanel(MainFrame.this));
 		contentTabPanel.setSelectedIndex(0);
 		c.add(contentTabPanel);
 	}

@@ -2,6 +2,9 @@ package com.ywj.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,6 +16,9 @@ import com.ywj.utils.JsonUtils;
 
 public class DataBaseDao {
 	public static final  String dataBaseFileName = "data\\dataBase.json";
+	public static final  String dataBaseNameMappings = "data\\dataBaseNameMappings.txt";
+	public static final  String tableNameMappings = "data\\tableNameMappings.txt";
+	private AtomicInteger index = new AtomicInteger();
 	
 	public DataBase getDataBaseById(int id) {
 		List<DataBase> databases = getAllDataBases();
@@ -94,6 +100,15 @@ public class DataBaseDao {
 		return  new String[] {"序号","部门名称","数据库名","数据总数"};
 	}
 	
+	public Vector<String> getUpdateTimeColumnNames() {
+		String[] titles = new String[] {"序号","库英文名称","库中文名称","表英文名称","表中文名称","最新更新时间"};
+		Vector<String> v = new Vector<String>();
+		for(String s: titles) {
+			v.add(s);
+		}
+		return v;
+	}
+	
 	public String[][] getData(){
 		List<DataBase> allDataBases = getAllDataBases();
 		String data[][] = new String[allDataBases.size()][getColumnNames().length];
@@ -108,6 +123,54 @@ public class DataBaseDao {
 		return data;
 	}
 	
+	public Vector<Vector<String>> getUpdateTimeData(){
+		//int index = 1;
+		Vector<Vector<String>> data = new Vector<>();
+		List<DataBase> allDataBases = getAllDataBases();
+		for(DataBase dataBase : allDataBases) {
+			DataBaseUtils dataBaseUtils = new DataBaseUtils(dataBase);
+			try {
+				List<String> tableNames =  dataBaseUtils.getMysqlTableNames();
+				for(String tableName : tableNames) {
+					Vector<String> row = new Vector<String>();
+					row.add("" +index.incrementAndGet());
+					row.add(dataBase.getDatabaseName());
+					row.add(getDataBaseCNName(dataBase.getDatabaseName()));
+					row.add(tableName);
+					row.add(getTableCNName(tableName));
+					row.add(getLastUpdateTime(dataBase,tableName));
+					data.add(row);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return data;
+		
+	}
+	
+	private String getLastUpdateTime(DataBase dataBase, String tableName) {
+		DataBaseUtils dataBaseUtils = new DataBaseUtils(dataBase);
+		try {
+			return dataBaseUtils.getTableLastUpdateTime(tableName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	private String getDataBaseCNName(String databaseENName) {
+		Map<String, String> map = FileUtils.fileToMap(dataBaseNameMappings);
+		return map.getOrDefault(databaseENName, "");
+	}
+	
+	private String getTableCNName(String tableENName) {
+		Map<String, String> map = FileUtils.fileToMap(tableNameMappings);
+		return map.getOrDefault(tableENName, "");
+	}
+
 	public long getDataNums(DataBase database) {
 		DataBaseUtils utils = new DataBaseUtils(database);
 		try {

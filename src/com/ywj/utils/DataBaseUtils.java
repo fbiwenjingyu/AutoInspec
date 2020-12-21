@@ -2,8 +2,10 @@ package com.ywj.utils;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,23 +49,32 @@ public class DataBaseUtils {
 		logger.debug("DataBaseUtils类的getDataNums方法查询数据库表数据总记录数开始");
 		logger.debug("数据库名：" + getDataBaseName());
 		long nums = 0;
-		Connection con = getMysqlConnection();
-		List<String> tableNames = getMysqlTableNames();
-		
-		for(String tableName : tableNames) {
-			//logger.debug("表名 ：" + tableName);
-			String countSql = "select count(*) from " +  "`" + tableName + "`";
-			PreparedStatement prepareStatement = con.prepareStatement(countSql);
-			ResultSet rs = prepareStatement.executeQuery();
-			if(rs.next()) {
-				long num = rs.getLong(1);
-				logger.debug("表名 ：" + tableName + " 记录数 ：" + num);
-				System.err.println("tableName = " + tableName + " table count = " + num);
-				nums += num;
+		Connection con = null;
+		try {
+			con = getMysqlConnection();
+			List<String> tableNames = getMysqlTableNames();
+			for(String tableName : tableNames) {
+				//logger.debug("表名 ：" + tableName);
+				String countSql = "select count(*) from " +  "`" + tableName + "`";
+				PreparedStatement prepareStatement = con.prepareStatement(countSql);
+				ResultSet rs = prepareStatement.executeQuery();
+				if(rs.next()) {
+					long num = rs.getLong(1);
+					logger.debug("表名 ：" + tableName + " 记录数 ：" + num);
+					System.err.println("tableName = " + tableName + " table count = " + num);
+					nums += num;
+				}
+				prepareStatement.close();
+				rs.close();
 			}
-			prepareStatement.close();
-			rs.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(con != null) {
+				con.close();
+			}
 		}
+		
 		con.close();
 		logger.debug("总记录数为：" + nums);
 		logger.debug("DataBaseUtils类的getDataNums方法查询数据库表数据总记录数结束");
@@ -71,11 +82,25 @@ public class DataBaseUtils {
 		return nums;
 	}
 	
+	public String getTableLastUpdateTime(String tableName) throws Exception{
+		Connection con = getMysqlConnection();
+		String lastUpdateTimeSql = "select max(data_up_time) from " +  "`" + tableName + "`";
+		PreparedStatement prepareStatement = con.prepareStatement(lastUpdateTimeSql);
+		ResultSet rs = prepareStatement.executeQuery();
+		if(rs.next()) {
+			Date date = rs.getDate(1);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+			return sdf.format(date);
+		}
+		return "";
+	}
+	
 	public List<String> getMysqlTableNames() throws Exception {
 		logger.debug("DataBaseUtils类的getMysqlTableNames方法获取数据库所有表名开始");
 		List<String> names = new ArrayList<String>();
+		Connection con = null;
 		try {
-			Connection con = getMysqlConnection();
+			con = getMysqlConnection();
 			DatabaseMetaData metaData = con.getMetaData();
 			ResultSet rs = metaData.getTables(getDataBaseName(), "", null, null);
 			while(rs.next()) {
@@ -87,6 +112,10 @@ public class DataBaseUtils {
 		}catch(Exception e) {
 			e.printStackTrace();
 			logger.error("DataBaseUtils类的getMysqlTableNames方法获取数据库所有表名出错，数据库名为：" + getDataBaseName() + " 错误信息为：" + e.toString() );
+		}finally {
+			if(con !=null) {
+				con.close();
+			}
 		}
 		logger.debug("DataBaseUtils类的getMysqlTableNames方法获取数据库所有表名结束");
 		return names;

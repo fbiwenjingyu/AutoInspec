@@ -6,8 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileUtils {
 	public static String fileToJsonStr(String fileName) {
@@ -57,4 +57,32 @@ public class FileUtils {
 			}
 		}
 	}
+	
+	public static Map<String,String> fileToMap(String fileName) {
+		Map<String,String> map = new HashMap<String, String>();
+		File f = new File(fileName);
+		if(!f.exists()) {
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+			String line = null;
+			while((line = br.readLine()) != null) {
+				String key = line.split("=")[0];
+				String value = line.split("=")[1];
+				map.put(key,value);
+			}
+			br.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return map;
+	}
+	
 }
