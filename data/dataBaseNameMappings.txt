@@ -1,0 +1,15 @@
+tmsbdc=天门市不动产
+tmscgj=天门市城管局
+tmsfcj=天门市房产局
+tmsgd=天门市供电
+tmsgs=天门市供水
+tmsgq=天门市供气
+tmsgjjzx=天门市公积金中心
+tmsggzy=天门市公共资源
+tmshbj=天门市环保局
+tmsmzj=天门市民政局
+tmswlh=天门市网格化
+tmsrsj=天门市人社局
+tmszwfwzx=天门市政务服务中心
+tmsgsj=天门市工商局
+tmswjw=天门市卫计委
