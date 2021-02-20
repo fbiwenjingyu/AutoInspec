@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.ywj.model.DataBase;
-import com.ywj.model.Machine;
 import com.ywj.utils.DataBaseUtils;
 import com.ywj.utils.FileUtils;
 import com.ywj.utils.JsonUtils;
