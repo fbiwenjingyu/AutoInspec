@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.ywj.model.DataBase;
+import com.ywj.model.Machine;
 import com.ywj.utils.DataBaseUtils;
 import com.ywj.utils.FileUtils;
 import com.ywj.utils.JsonUtils;
@@ -18,7 +19,7 @@ public class DataBaseDao {
 	public static final  String dataBaseFileName = "data\\dataBase.json";
 	public static final  String dataBaseNameMappings = "data\\dataBaseNameMappings.txt";
 	public static final  String tableNameMappings = "data\\tableNameMappings.txt";
-	private AtomicInteger index = new AtomicInteger();
+	//private AtomicInteger index = new AtomicInteger();
 	
 	public DataBase getDataBaseById(int id) {
 		List<DataBase> databases = getAllDataBases();
@@ -124,7 +125,7 @@ public class DataBaseDao {
 	}
 	
 	public Vector<Vector<String>> getUpdateTimeData(){
-		//int index = 1;
+		AtomicInteger index = new AtomicInteger();
 		Vector<Vector<String>> data = new Vector<>();
 		List<DataBase> allDataBases = getAllDataBases();
 		for(DataBase dataBase : allDataBases) {
@@ -149,6 +150,62 @@ public class DataBaseDao {
 		return data;
 		
 	}
+	
+	public Vector<Vector<String>> getDataBySearch(String databaseName, String tableEnName) {
+		AtomicInteger index = new AtomicInteger();
+		if(StringUtils.isEmpty(databaseName) && StringUtils.isEmpty(tableEnName)) return getUpdateTimeData();
+		Vector<Vector<String>> data = new Vector<>();
+		List<DataBase> allDataBases = getAllDataBases();
+		for(DataBase dataBase : allDataBases) {
+			DataBaseUtils dataBaseUtils = new DataBaseUtils(dataBase);
+			try {
+				List<String> tableNames =  dataBaseUtils.getMysqlTableNames();
+				for(String tableName : tableNames) {
+					Vector<String> row = new Vector<String>();
+					
+					if(StringUtils.isNotEmpty(databaseName) && StringUtils.isNotEmpty(tableEnName)) {
+						if((getDataBaseCNName(dataBase.getDatabaseName()).toLowerCase().indexOf(databaseName.toLowerCase()) != -1) && (tableName.indexOf(tableEnName) != -1 )) {
+							row.add("" +index.incrementAndGet());
+							row.add(dataBase.getDatabaseName());
+							row.add(getDataBaseCNName(dataBase.getDatabaseName()));
+							row.add(tableName);
+							row.add(getTableCNName(tableName));
+							row.add(getLastUpdateTime(dataBase,tableName));
+							data.add(row);
+						}
+						
+					}else if(StringUtils.isNotEmpty(databaseName)) {
+						if(getDataBaseCNName(dataBase.getDatabaseName()).toLowerCase().indexOf(databaseName.toLowerCase()) != -1) {
+							row.add("" +index.incrementAndGet());
+							row.add(dataBase.getDatabaseName());
+							row.add(getDataBaseCNName(dataBase.getDatabaseName()));
+							row.add(tableName);
+							row.add(getTableCNName(tableName));
+							row.add(getLastUpdateTime(dataBase,tableName));
+							data.add(row);
+						}
+					}else if(StringUtils.isNotEmpty(tableEnName)) {
+						if(tableName.indexOf(tableEnName) != -1 ) {
+							row.add("" +index.incrementAndGet());
+							row.add(dataBase.getDatabaseName());
+							row.add(getDataBaseCNName(dataBase.getDatabaseName()));
+							row.add(tableName);
+							row.add(getTableCNName(tableName));
+							row.add(getLastUpdateTime(dataBase,tableName));
+							data.add(row);
+						}
+					}
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return data;
+		
+	} 
+
 	
 	private String getLastUpdateTime(DataBase dataBase, String tableName) {
 		DataBaseUtils dataBaseUtils = new DataBaseUtils(dataBase);

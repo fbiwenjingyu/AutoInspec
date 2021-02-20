@@ -75,7 +75,6 @@ public class DataBaseUtils {
 			}
 		}
 		
-		con.close();
 		logger.debug("总记录数为：" + nums);
 		logger.debug("DataBaseUtils类的getDataNums方法查询数据库表数据总记录数结束");
 		
@@ -83,15 +82,25 @@ public class DataBaseUtils {
 	}
 	
 	public String getTableLastUpdateTime(String tableName) throws Exception{
-		Connection con = getMysqlConnection();
-		String lastUpdateTimeSql = "select max(data_up_time) from " +  "`" + tableName + "`";
-		PreparedStatement prepareStatement = con.prepareStatement(lastUpdateTimeSql);
-		ResultSet rs = prepareStatement.executeQuery();
-		if(rs.next()) {
-			Date date = rs.getDate(1);
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-			return sdf.format(date);
+		Connection con = null;
+		try{
+			con = getMysqlConnection();
+			String lastUpdateTimeSql = "select max(data_up_time) from " +  "`" + tableName + "`";
+			PreparedStatement prepareStatement = con.prepareStatement(lastUpdateTimeSql);
+			ResultSet rs = prepareStatement.executeQuery();
+			if(rs.next()) {
+				Date date = rs.getDate(1);
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+				return sdf.format(date);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(con != null) {
+				con.close();
+			}
 		}
+		
 		return "";
 	}
 	

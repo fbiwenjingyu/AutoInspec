@@ -73,9 +73,12 @@ public class FileUtils {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 			String line = null;
 			while((line = br.readLine()) != null) {
-				String key = line.split("=")[0];
-				String value = line.split("=")[1];
-				map.put(key,value);
+				if(line.split("=").length >=2) {
+					String key = line.split("=")[0];
+					String value = line.split("=")[1];
+					map.put(key,value);
+				}
+				
 			}
 			br.close();
 		} catch (IOException e) {

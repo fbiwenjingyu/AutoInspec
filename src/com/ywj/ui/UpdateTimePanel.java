@@ -11,14 +11,18 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.ywj.dao.DataBaseDao;
 import com.ywj.utils.ExcelExporter;
@@ -31,6 +35,13 @@ public class UpdateTimePanel extends JPanel {
 	JTable table = new JTable();
 	DataBaseDao dao = new DataBaseDao();
 	
+	JLabel databaseNameLabel;
+	JTextField databaseNameText;
+	JLabel tableEnNameLabel;
+	JTextField tableEnNameText;
+	JButton searchbutton;
+	JButton refreshbutton;
+	
 	public UpdateTimePanel(JFrame parent) {
 		this.parent = parent;
 		setProperties();
@@ -41,9 +52,24 @@ public class UpdateTimePanel extends JPanel {
 		
 	}
 	private void initTopPanel() {
+		databaseNameLabel = new JLabel("库中文名");
+		databaseNameLabel.setLabelFor(databaseNameText);
+		databaseNameText = new JTextField(15);
+		tableEnNameLabel = new JLabel("表英文名");
+		tableEnNameLabel.setLabelFor(tableEnNameText);
+		tableEnNameText = new JTextField(15);
+		searchbutton = new JButton("搜索");
+		refreshbutton = new JButton("刷新");
+		top.add(databaseNameLabel);
+		top.add(databaseNameText);
+		top.add(tableEnNameLabel);
+		top.add(tableEnNameText);
+		top.add(searchbutton);	
+		top.add(refreshbutton);	
+		
 		exportExcelButton = new JButton("导出到excel");
 		top.add(exportExcelButton);
-		top.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		top.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
 		exportExcelButton.addActionListener(new ActionListener() {
 			@Override
@@ -58,6 +84,20 @@ public class UpdateTimePanel extends JPanel {
 		         } catch (IOException ex) {
 		             ex.printStackTrace();
 		         }
+			}
+		});
+		
+		refreshbutton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showTable();	
+			}
+		});
+		
+		searchbutton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showTableSearch(databaseNameText.getText(),tableEnNameText.getText());		
 			}
 		});
 	}
@@ -89,6 +129,26 @@ public class UpdateTimePanel extends JPanel {
 		}).start();
 		
     }
+	
+	public void showTableSearch(String databaseName,String tableEnName) {
+		new Thread(()->{
+			if(StringUtils.isEmpty(databaseName) && StringUtils.isEmpty(tableEnName)) {
+				showTable();
+				return;
+			}
+			Vector colum = dao.getUpdateTimeColumnNames();
+			Vector data = dao.getDataBySearch(databaseName,tableEnName);
+			TableModel dataModel = new DefaultTableModel(data, colum){
+				public boolean isCellEditable(int row, int column)
+				{
+					return false;
+				}
+			};
+			table.setModel(dataModel);
+			table.setRowHeight(30);
+			table.validate();
+		}).start();
+	}
 	
 	private void setProperties() {
 		this.setLayout(new BorderLayout());
